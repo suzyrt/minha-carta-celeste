@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0d1531" />
+  <meta name="description" content="Crie um mapa celeste personalizado para um momento inesquecível." />
+  <title>Minha Carta Celeste</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#top" aria-label="Minha Carta Celeste">
+      <span class="brand-mark">✦</span>
+      <span>MINHA CARTA CELESTE</span>
+    </a>
+    <nav>
+      <a href="#como-funciona">Como funciona</a>
+      <a href="#editor">Criar mapa</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">UM INSTANTE. UM CÉU. PARA SEMPRE.</p>
+        <h1>O céu exatamente como estava no seu momento.</h1>
+        <p class="lead">Escolha uma data, hora e lugar. Nós reconstruímos o céu daquele instante e transformamos em uma peça personalizada para guardar, presentear ou imprimir.</p>
+        <a class="primary-btn" href="#editor">Criar minha carta celeste</a>
+      </div>
+      <div class="hero-orbit" aria-hidden="true">
+        <span class="orbit orbit-a"></span>
+        <span class="orbit orbit-b"></span>
+        <span class="orbit orbit-c"></span>
+        <span class="hero-star s1">✦</span>
+        <span class="hero-star s2">✧</span>
+        <span class="hero-star s3">✦</span>
+      </div>
+    </section>
+
+    <section id="como-funciona" class="how">
+      <div><strong>01</strong><h3>Escolha o momento</h3><p>Data, hora e localização definem a posição do céu.</p></div>
+      <div><strong>02</strong><h3>Personalize</h3><p>Nome, frase, cores, tipografia e constelações.</p></div>
+      <div><strong>03</strong><h3>Receba em alta</h3><p>Arquivo digital pronto para imprimir com qualidade.</p></div>
+    </section>
+
+    <section id="editor" class="editor-shell">
+      <aside class="panel controls">
+        <div class="panel-head">
+          <span class="step-pill">EDITOR</span>
+          <h2>Crie seu mapa</h2>
+          <p>As alterações aparecem na prévia em tempo real.</p>
+        </div>
+
+        <div class="control-group">
+          <label for="titleInput">Nome ou título</label>
+          <input id="titleInput" maxlength="44" value="Suzana" placeholder="Ex.: Ana & Pedro" />
+        </div>
+
+        <div class="control-group">
+          <label for="messageInput">Mensagem</label>
+          <input id="messageInput" maxlength="72" value="O céu no instante em que tudo começou" placeholder="Uma frase especial" />
+        </div>
+
+        <div class="location-wrap control-group">
+          <label for="locationInput">Lugar</label>
+          <div class="search-line">
+            <input id="locationInput" autocomplete="off" value="Rio de Janeiro, Brasil" placeholder="Cidade, estado ou país" />
+            <button id="locationBtn" class="icon-btn" type="button" title="Buscar localização">⌕</button>
+          </div>
+          <div id="locationResults" class="results" hidden></div>
+          <div class="coords">
+            <label>Latitude <input id="latInput" type="number" step="0.0001" value="-22.9068" /></label>
+            <label>Longitude <input id="lonInput" type="number" step="0.0001" value="-43.1729" /></label>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="control-group">
+            <label for="dateInput">Data</label>
+            <input id="dateInput" type="date" value="2026-08-31" />
+          </div>
+          <div class="control-group">
+            <label for="timeInput">Hora</label>
+            <input id="timeInput" type="time" value="00:00" />
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label for="tzInput">Fuso horário (UTC)</label>
+          <select id="tzInput">
+            <option value="-5">UTC−5</option>
+            <option value="-4">UTC−4</option>
+            <option value="-3" selected>UTC−3 — Brasília</option>
+            <option value="-2">UTC−2</option>
+            <option value="-1">UTC−1</option>
+            <option value="0">UTC±0</option>
+            <option value="1">UTC+1</option>
+            <option value="2">UTC+2</option>
+            <option value="3">UTC+3</option>
+            <option value="4">UTC+4</option>
+            <option value="5">UTC+5</option>
+            <option value="6">UTC+6</option>
+            <option value="7">UTC+7</option>
+            <option value="8">UTC+8</option>
+            <option value="9">UTC+9</option>
+            <option value="10">UTC+10</option>
+            <option value="11">UTC+11</option>
+            <option value="12">UTC+12</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label>Estilo</label>
+          <div class="swatches" id="themeSwatches">
+            <button type="button" data-theme="midnight" class="swatch midnight active" aria-label="Azul meia-noite"></button>
+            <button type="button" data-theme="black" class="swatch black" aria-label="Preto"></button>
+            <button type="button" data-theme="ivory" class="swatch ivory" aria-label="Marfim"></button>
+            <button type="button" data-theme="terracotta" class="swatch terracotta" aria-label="Terracota"></button>
+            <button type="button" data-theme="forest" class="swatch forest" aria-label="Verde floresta"></button>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="control-group">
+            <label for="fontInput">Tipografia</label>
+            <select id="fontInput">
+              <option value="serif">Clássica</option>
+              <option value="modern">Moderna</option>
+              <option value="clean">Minimalista</option>
+            </select>
+          </div>
+          <div class="control-group">
+            <label for="sizeInput">Formato</label>
+            <select id="sizeInput">
+              <option value="A4">A4 — 21 × 29,7 cm</option>
+              <option value="A3">A3 — 29,7 × 42 cm</option>
+              <option value="30x40">30 × 40 cm</option>
+              <option value="40x50">40 × 50 cm</option>
+              <option value="50x70">50 × 70 cm</option>
+            </select>
+          </div>
+        </div>
+
+        <label class="toggle-row">
+          <input id="constellationToggle" type="checkbox" checked />
+          <span>Linhas das constelações</span>
+        </label>
+
+        <label class="toggle-row">
+          <input id="gridToggle" type="checkbox" />
+          <span>Grade celeste discreta</span>
+        </label>
+
+        <div class="action-stack">
+          <button id="previewDownloadBtn" class="secondary-btn" type="button">Baixar prévia</button>
+          <button id="buyBtn" class="primary-btn full" type="button">Comprar arquivo em alta</button>
+          <p class="microcopy">Pagamento seguro. O arquivo final é liberado após a confirmação.</p>
+        </div>
+      </aside>
+
+      <section class="preview-stage" aria-label="Prévia da carta celeste">
+        <div class="preview-toolbar">
+          <span id="statusText">Carregando catálogo celeste…</span>
+          <span id="formatText">A4</span>
+        </div>
+        <article id="poster" class="poster theme-midnight font-serif">
+          <div class="poster-inner">
+            <div class="map-ring">
+              <canvas id="skyCanvas" width="1200" height="1200" aria-label="Mapa celeste"></canvas>
+            </div>
+            <div class="poster-copy">
+              <p id="posterTitle" class="poster-title">SUZANA</p>
+              <p id="posterMessage" class="poster-message">O CÉU NO INSTANTE EM QUE TUDO COMEÇOU</p>
+              <div class="divider"><span>✦</span></div>
+              <p id="posterPlace" class="poster-place">RIO DE JANEIRO, BRASIL</p>
+              <p id="posterDate" class="poster-date">31 DE AGOSTO DE 2026 · 00:00</p>
+              <p id="posterCoords" class="poster-coords">22.9068° S · 43.1729° O</p>
+            </div>
+          </div>
+        </article>
+      </section>
+    </section>
+
+    <section class="trust-strip">
+      <p>Seu momento é único. O céu também.</p>
+      <span>Arquivo digital • Alta resolução • Pronto para impressão</span>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
