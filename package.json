@@ -1,0 +1,9 @@
+{
+  "name": "minha-carta-celeste",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Gerador de mapas celestes personalizados para Netlify",
+  "dependencies": {
+    "stripe": "^18.5.0"
+  }
+}
