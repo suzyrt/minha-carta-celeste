@@ -1,4 +1,5 @@
 [build]
+  command = "npm run prepare-data"
   publish = "."
   functions = "netlify/functions"
 
@@ -13,6 +14,11 @@
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "geolocation=(self)"
 
+[[headers]]
+  for = "/data/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400, immutable"
+
 [[redirects]]
   from = "/api/geocode"
   to = "/.netlify/functions/geocode"
@@ -26,4 +32,9 @@
 [[redirects]]
   from = "/api/verify"
   to = "/.netlify/functions/verify"
+  status = 200
+
+[[redirects]]
+  from = "/api/download"
+  to = "/.netlify/functions/download"
   status = 200
