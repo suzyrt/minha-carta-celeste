@@ -5,7 +5,8 @@ const els = {
   lat: $('latInput'), lon: $('lonInput'), date: $('dateInput'), time: $('timeInput'), tz: $('tzInput'),
   font: $('fontInput'), size: $('sizeInput'), constellation: $('constellationToggle'), grid: $('gridToggle'),
   poster: $('poster'), status: $('statusText'), format: $('formatText'), results: $('locationResults'),
-  locationBtn: $('locationBtn'), previewDownload: $('previewDownloadBtn'), buy: $('buyBtn'), toast: $('toast')
+  locationBtn: $('locationBtn'), previewDownload: $('previewDownloadBtn'), buy: $('buyBtn'), toast: $('toast'),
+  email: $('emailInput')
 };
 
 const palette = {
@@ -124,8 +125,8 @@ function updateCopy() {
   $('posterPlace').textContent = (els.location.value || 'LOCAL ESPECIAL').toUpperCase();
   $('posterDate').textContent = formatDatePt();
   $('posterCoords').textContent = `${formatCoord(Number(els.lat.value),'N','S')} · ${formatCoord(Number(els.lon.value),'L','O')}`;
-  els.format.textContent = els.size.value;
-  const ratios={A4:'210/297',A3:'297/420','30x40':'3/4','40x50':'4/5','50x70':'5/7'};
+  els.format.textContent = els.size.value === '60' ? '42,4 × 60 cm' : els.size.value;
+  const ratios={A4:'210/297',A3:'297/420','60':'424/600'};
   els.poster.style.aspectRatio=ratios[els.size.value]||'210/297';
 }
 function render(){updateCopy();drawSky();}
@@ -175,7 +176,7 @@ async function searchLocation(){
 
 function escapeXml(s){return String(s).replace(/[<>&'\"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;',"'":'&apos;','\"':'&quot;'}[c]));}
 function posterSpec(high=false){
-  const sizes={A4:[2480,3508],A3:[3508,4961],'30x40':[3000,4000],'40x50':[3200,4000],'50x70':[3500,4900]};
+  const sizes={A4:[2480,3508],A3:[3508,4961],'60':[5011,7087]};
   let [w,h]=sizes[els.size.value]||sizes.A4;if(!high){const k=1400/h;w=Math.round(w*k);h=1400;}return {w,h};
 }
 function makeSvg(high=false){
@@ -207,13 +208,16 @@ async function downloadFinal(){
 }
 async function buy(){
   if(paidUnlocked)return downloadFinal();
-  els.buy.disabled=true;els.buy.textContent='Abrindo pagamento…';
-  try{const r=await fetch('/api/checkout',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({title:els.title.value,size:els.size.value})});const data=await r.json();if(!r.ok)throw new Error(data.error||'Checkout indisponível');window.location.href=data.url;}
+  const email=(els.email.value||'').trim();
+  if(!email || !els.email.checkValidity()){els.email.focus();toast('Digite um e-mail válido para receber sua Carta Celeste.');return;}
+  els.buy.disabled=true;els.buy.textContent='Abrindo Mercado Pago…';
+  try{const r=await fetch('/api/checkout',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({title:els.title.value,size:els.size.value,email})});const data=await r.json();if(!r.ok)throw new Error(data.error||'Checkout indisponível');localStorage.setItem('mcc-buyer-email',email);window.location.href=data.url;}
   catch(e){toast(e.message||'Não foi possível iniciar o pagamento.');els.buy.disabled=false;els.buy.textContent='Comprar arquivo em alta';}
 }
 async function verifyPayment(){
-  const p=new URLSearchParams(location.search),sid=p.get('session_id');if(p.get('payment')!=='success'||!sid)return;
-  try{const r=await fetch(`/api/verify?session_id=${encodeURIComponent(sid)}`),data=await r.json();if(data.paid){paidUnlocked=true;localStorage.setItem('mcc-paid-unlocked','1');els.buy.textContent='Baixar arquivos em alta';toast('Pagamento confirmado. Seus arquivos em alta estão liberados.');history.replaceState({},'',location.pathname);}}
+  const p=new URLSearchParams(location.search),paymentId=p.get('payment_id');
+  if(p.get('payment')!=='success'||!paymentId)return;
+  try{const r=await fetch(`/api/verify?payment_id=${encodeURIComponent(paymentId)}`),data=await r.json();if(data.paid){paidUnlocked=true;localStorage.setItem('mcc-paid-unlocked','1');els.buy.textContent='Baixar arquivos em alta';toast('Pagamento confirmado. Seus arquivos em alta estão liberados.');history.replaceState({},'',location.pathname);}}
   catch{}
 }
 
@@ -223,5 +227,6 @@ document.querySelectorAll('.swatch').forEach(b=>b.addEventListener('click',()=>{
 els.locationBtn.addEventListener('click',searchLocation);els.location.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();searchLocation();}});document.addEventListener('click',e=>{if(!e.target.closest('.location-wrap'))els.results.hidden=true});
 els.previewDownload.addEventListener('click',downloadPreview);els.buy.addEventListener('click',buy);
 
+if(localStorage.getItem('mcc-buyer-email')) els.email.value=localStorage.getItem('mcc-buyer-email');
 if(paidUnlocked)els.buy.textContent='Baixar arquivos em alta';
 updateCopy();loadSkyData();verifyPayment();
