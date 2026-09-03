@@ -1,7 +1,12 @@
 {
   "name": "minha-carta-celeste",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
-  "description": "Gerador de mapas celestes personalizados para Netlify",
-  "dependencies": {}
+  "description": "Carta celeste personalizada com checkout Mercado Pago e entrega segura no Netlify",
+  "scripts": {
+    "prepare-data": "node scripts/fetch-sky-data.mjs"
+  },
+  "dependencies": {
+    "@netlify/blobs": "^11.0.3"
+  }
 }
