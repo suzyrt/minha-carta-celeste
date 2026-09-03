@@ -1,44 +1,63 @@
 # Minha Carta Celeste
 
-MVP de uma loja de mapas celestes personalizados, pronto para deploy no Netlify.
+Loja digital de cartas celestes personalizadas, hospedada no Netlify e integrada ao Mercado Pago.
 
-## O que já funciona
+## Fluxo atual
 
-- Mapa do céu calculado a partir de latitude, longitude, data, hora e fuso horário.
-- Busca de cidade/local via função serverless do Netlify + OpenStreetMap/Nominatim.
-- Catálogo estelar até magnitude 6 e linhas das constelações carregados do projeto open-source d3-celestial.
-- Personalização de nome, mensagem, local, cores, tipografia e linhas das constelações.
-- Prévia responsiva em tempo real.
-- Exportação de prévia PNG.
-- Fluxo opcional de pagamento Stripe Checkout.
-- Depois de um Checkout verificado, download em SVG vetorial e PNG de alta resolução.
+1. A pessoa informa data, hora, fuso e local.
+2. Personaliza título, mensagem, cor, tipografia, tamanho e presença visual de Sol, Lua, planetas e constelações.
+3. A prévia é calculada no navegador.
+4. Antes do checkout, o design é salvo no backend (Netlify Blobs).
+5. O Mercado Pago processa o pagamento.
+6. Após confirmação `approved`, o backend gera o SVG final em alta usando o design salvo.
+7. O arquivo fica protegido por um token assinado e é liberado por `/api/download`.
+8. Se o Resend estiver configurado, o comprador recebe o link por e-mail junto com uma leitura curta, educativa e poética sobre o céu daquele instante.
+
+## Tamanhos
+
+- A4 — 21 × 29,7 cm
+- A3 — 29,7 × 42 cm
+- Grande — 42,4 × 60 cm (mesma proporção da série A)
+
+## Catálogo astronômico local no deploy
+
+O navegador não consulta o GitHub do d3-celestial a cada visita. Durante o build, `scripts/fetch-sky-data.mjs` copia uma versão fixada dos arquivos `stars.6.json` e `constellations.lines.json` para `/data`. Depois do deploy eles são servidos pelo próprio domínio do Minha Carta Celeste.
+
+A origem está fixada no commit `7e720a3de062059d4c5400a379146a601d9010e0` do d3-celestial para evitar mudanças inesperadas entre builds.
+
+## Variáveis de ambiente no Netlify
+
+Obrigatórias para pagamento:
+
+- `MERCADO_PAGO_ACCESS_TOKEN`
+- `MERCADO_PAGO_WEBHOOK_SECRET`
+- `SITE_URL` — URL pública final, sem barra no fim
+
+Preços (em centavos):
+
+- `PRICE_A4_CENTS` — padrão `4990`
+- `PRICE_A3_CENTS` — padrão `5990`
+- `PRICE_60_CENTS` — padrão `6990`
+
+Para e-mail automático:
+
+- `RESEND_API_KEY`
+- `EMAIL_FROM` — remetente verificado no Resend, por exemplo `Minha Carta Celeste <cartas@seudominio.com.br>`
+
+## Segurança do pagamento
+
+- O Access Token do Mercado Pago nunca fica no JavaScript do navegador.
+- O webhook valida `x-signature` com HMAC-SHA256 antes de processar notificações.
+- O backend consulta o pagamento diretamente na API do Mercado Pago antes de liberar a arte.
+- O design comprado é armazenado antes do checkout; a versão final não depende de um `localStorage` de “pago”.
+- A arte final é gerada no backend e guardada no Netlify Blobs.
 
 ## Deploy no Netlify
 
-1. No Netlify, escolha **Add new project > Import an existing project > GitHub**.
-2. Selecione `suzyrt/minha-carta-celeste`.
-3. Build command: deixe vazio.
-4. Publish directory: `.`
-5. Faça o deploy.
-
-O arquivo `netlify.toml` já contém as configurações necessárias.
-
-## Pagamento Stripe (opcional durante desenvolvimento)
-
-No Netlify, em **Site configuration > Environment variables**, crie:
-
-- `STRIPE_SECRET_KEY` = sua chave secreta Stripe (`sk_...`)
-- `SITE_URL` = URL final do site, por exemplo `https://minha-carta-celeste.netlify.app`
-- `PRODUCT_PRICE_CENTS` = preço em centavos, por exemplo `4990` para R$ 49,90
-
-Sem essas variáveis o editor e a prévia continuam funcionando, mas o botão de compra informa que o checkout ainda não foi configurado.
+Importe o repositório GitHub. O `netlify.toml` define o build automaticamente. O comando executado é `npm run prepare-data` e o diretório publicado é `.`.
 
 ## Precisão astronômica
 
-O motor converte ascensão reta/declinação para altitude/azimute usando tempo sideral de Greenwich, coordenadas geográficas e instante UTC. Para o MVP, as posições catalogadas são J2000 sem correção fina de precessão, nutação, refração atmosférica ou movimento próprio. Isso é mais do que suficiente para a aparência de um pôster do céu nas últimas décadas, mas uma versão científica/observacional pode adicionar essas correções.
+O projeto usa posições estelares de catálogo J2000 e um modelo de baixa precisão para Sol, Lua e planetas. A projeção converte ascensão reta/declinação para altitude/azimute a partir do instante UTC e das coordenadas informadas. O objetivo é um produto gráfico astronômico; não substitui efemérides de observatório de alta precisão.
 
-## Dados e atribuições
-
-Os dados estelares e linhas de constelações são carregados em tempo de execução a partir do projeto [d3-celestial](https://github.com/ofrohn/d3-celestial), de Olaf Frohn, licenciado sob BSD-3-Clause. Consulte `THIRD_PARTY_NOTICES.md`.
-
-A busca geográfica usa OpenStreetMap/Nominatim por meio de uma função serverless para evitar expor a integração diretamente no navegador.
+Consulte `THIRD_PARTY_NOTICES.md` para dados e licenças de terceiros.
